@@ -3,6 +3,7 @@ package controllers
 import (
 	"b2g/app/services"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"time"
 
@@ -42,7 +43,11 @@ func (c App) Hello() revel.Result {
 func (c App) GetUser() revel.Result {
 	s := services.NewUserService(nil)
 	id := 1
-	u := s.GetUser(services.GetUserOptions{ID: &id})
+	u, err := s.GetUser(services.GetUserOptions{ID: &id})
+	if err != nil {
+		return c.RenderError(errors.New("Couldn't load user"))
+	}
+
 	data := map[string]interface{}{
 		"id":       u.ID(),
 		"name":     u.UserName(),

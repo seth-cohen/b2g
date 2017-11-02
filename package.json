@@ -1,0 +1,26 @@
+{
+  "name": "b2g",
+  "version": "0.0.1",
+  "description": "Born to Game - where gamers are born",
+  "main": "index.js",
+  "author": "Seth Cohen <seth.h.cohen@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "revel run b2g"
+  },
+  "dependencies": {
+    "path": "^0.12.7",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "webpack": "^3.8.1",
+    "webpack-dev-server": "^2.9.3"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-eslint": "7",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "eslint": "3.x"
+  }
+}
