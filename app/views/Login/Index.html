@@ -1,0 +1,37 @@
+{{set . "title" "Home"}}
+{{template "header.html" .}}
+
+<header class="jumbotron" style="background-color:#A9F16C">
+  <div class="container">
+    <div class="row">
+      <h1>Please log in or create account</h1>
+      <p></p>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="row">
+    <div class="span6">
+      {{template "flash.html" .}}
+    </div>
+    <form action="/login" method="POST">
+      {{with $field := field "username" .}}
+        <div class="form-group">
+          <input class="form-control" type="text" name="{{$field.Name}}" value="{{$field.Flash}}" required/>
+          <label class="form-control-placeholder" for="{{$field.Name}}">Username</label>
+        </div>
+      {{end}}
+      {{with $field := field "password" .}}
+        <div class="form-group">
+          <input class="form-control" type="password" name="{{$field.Name}}" value="{{$field.Flash}}" required/>
+          <label class="form-control-placeholder" for="{{$field.Name}}">Password</label>
+        </div>
+      {{end}}
+      <input type="submit" value="Login" />
+    </form>
+    <a href="/register">Create New Account</a>
+  </div>
+</div>
+
+{{template "footer.html" .}}
