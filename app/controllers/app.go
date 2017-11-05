@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"b2g/app/models"
+	"b2g/app/serializers"
 	"b2g/app/services"
 	"encoding/json"
 	"errors"
@@ -17,12 +19,20 @@ type App struct {
 
 // Index is the entry point for the application home page
 func (c App) Index() revel.Result {
-	if c.getUserLoginLevel() == NONE {
-		return c.Redirect(Login.Index)
+	u := &models.User{}
+	var err error
+
+	if c.getUserLoginLevel() > NONE {
+		s := services.NewUserService(nil)
+		userName := c.Session["userName"]
+		if u, err = s.GetUser(services.GetUserOptions{UserName: &userName}); err != nil {
+			u = &models.User{}
+		}
 	}
 
-	greeting := c.Session["userName"]
-	return c.Render(greeting)
+	initial := serializers.BootstrapData(u, int(c.getUserLoginLevel()))
+	moreScripts := []string{"index_bundle.js"}
+	return c.Render(initial, moreScripts)
 }
 
 // Hello is the endpoint respond to user form entry

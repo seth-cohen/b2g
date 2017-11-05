@@ -59,7 +59,7 @@ var HeaderFilter = func(c *revel.Controller, fc []revel.Filter) {
 }
 
 func InitDB() {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?timeout=1s",
 		revel.Config.StringDefault("db.user", ""),
 		revel.Config.StringDefault("db.password", ""),
 		revel.Config.StringDefault("db.host", ""),

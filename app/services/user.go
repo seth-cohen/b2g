@@ -33,14 +33,14 @@ type GetUserOptions struct {
 // GetUser is the main method that we will use to load a user from the datasource
 func (s UserService) GetUser(input GetUserOptions) (*models.User, error) {
 	if input.ID != nil {
-		return s.getByID(*input.ID), nil
+		return s.getByID(*input.ID)
 	} else if input.EmailAddress != nil {
-		return s.getByEmail(*input.EmailAddress), nil
+		return s.getByEmail(*input.EmailAddress)
 	} else if input.UserName != nil {
-		return s.getByUserName(*input.UserName), nil
+		return s.getByUserName(*input.UserName)
 	}
 
-	return nil, errors.New("No input value given to load by")
+	return &models.User{}, errors.New("No input value given to load by")
 }
 
 // VerifyEmailAndPassword checks to see if the password matches that of the username
@@ -58,29 +58,29 @@ func (s UserService) IsUserNameTaken(userName string) bool {
 	return true
 }
 
-func (s UserService) getByID(id int) *models.User {
+func (s UserService) getByID(id int) (*models.User, error) {
 	user, err := s.repo.GetByID(id)
 	if err != nil {
-		return nil
+		return nil, errors.New("Unable to get user by ID")
 	}
 
-	return user
+	return user, nil
 }
 
-func (s UserService) getByEmail(email string) *models.User {
+func (s UserService) getByEmail(email string) (*models.User, error) {
 	user, err := s.repo.GetByEmailAddress(email)
 	if err != nil {
-		return nil
+		return nil, errors.New("Unable to get user by email")
 	}
 
-	return user
+	return user, nil
 }
 
-func (s UserService) getByUserName(userName string) *models.User {
+func (s UserService) getByUserName(userName string) (*models.User, error) {
 	user, err := s.repo.GetByUserName(userName)
 	if err != nil {
-		return nil
+		return nil, errors.New("Unable to get user by userName")
 	}
 
-	return user
+	return user, nil
 }
