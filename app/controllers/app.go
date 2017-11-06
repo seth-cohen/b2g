@@ -30,8 +30,12 @@ func (c App) Index() revel.Result {
 		}
 	}
 
-	initial := serializers.BootstrapData(u, int(c.getUserLoginLevel()))
+	initialData, _ := json.Marshal(serializers.BootstrapData(u, int(c.getUserLoginLevel())))
+	initial := string(initialData)
+
 	moreScripts := []string{"index_bundle.js"}
+
+	// We are dumping this into HTML so we need to cast the JSON into a string
 	return c.Render(initial, moreScripts)
 }
 

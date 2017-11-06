@@ -25,6 +25,7 @@ type UserRepository interface {
 	GetByID(id int) (*models.User, error)
 	GetByUserName(userName string) (*models.User, error)
 	GetByEmailAddress(email string) (*models.User, error)
+	CreateUser(user *models.User) (int, error)
 }
 
 // UserMySQLRepository handles all user data storage requests for the MySQL data store
@@ -113,6 +114,38 @@ func (db UserMySQLRepository) processGetUserQuery(sql string, value interface{})
 	}
 
 	return mapDataToUser(data), nil
+}
+
+// CreateUser attempts to save user data to the database
+func (db UserMySQLRepository) CreateUser(user *models.User) (int, error) {
+	var userID int
+	sqlString := `
+		INSERT INTO tblUser (UserName, EmailAddress, PasswordHash) VALUES (?, ?, ?);
+		SELECT LAST_INSERT_ID();
+	`
+
+	stmt, err := app.DB.Prepare(sqlString)
+	if err != nil {
+		revel.INFO.Println("Error preparing statement", err)
+		return -1, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(user.UserName(), user.EmailAddress(), user.PasswordHash())
+	if err != nil {
+		revel.INFO.Println("Error executing query", err)
+		return -1, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&userID)
+		if err != nil {
+			revel.INFO.Println("Error executing query", err)
+			return -1, err
+		}
+	}
+	return userID, nil
 }
 
 func mapDataToUser(data UserResponse) *models.User {

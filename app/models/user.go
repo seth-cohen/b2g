@@ -13,6 +13,7 @@ type User struct {
 	userName     string
 	emailAddress string
 	passwordHash string
+	password     string
 	profile      UserProfile
 }
 
@@ -52,8 +53,23 @@ func (u *User) SetEmailAddress(emailAddress string) *User {
 	return u
 }
 
+// SetPassword setter
+func (u *User) SetPassword(password string) *User {
+	u.password = password
+	if u.passwordHash == "" {
+		u.password, _ = hashPassword(u.password)
+	}
+
+	return u
+}
+
+// PasswordHash getter
+func (u User) PasswordHash() string {
+	return u.passwordHash
+}
+
 // HashPassword uses bcrypt to generate the cryptofied version of the password that is safe to save in the DB
-func HashPassword(pw string) (string, error) {
+func hashPassword(pw string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(pw), 14)
 	return string(bytes), err
 }

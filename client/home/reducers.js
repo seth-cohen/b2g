@@ -1,18 +1,38 @@
-import { combineReducers } from 'redux';
-import { UPDATE_NAME, SUBMITED_LANDING_FORM } from './types'
+import { combineReducers } from "redux";
+import {
+  UPDATE_NAME,
+  SUBMITTED_LANDING_FORM,
+  SUBMITTED_REGISTRATION_FORM,
+  CLEAR_ERRORS
+} from "./types";
 
-function login(state = {userName: ""}, action) {
-  switch (action.type) {
+function login(state = { userName: "" }, { type, payload }) {
+  switch (type) {
     case UPDATE_NAME:
       return {
         ...state,
-        userName: action.userName
-      }
-    case SUBMITED_LANDING_FORM:
+        userName: payload.userName
+      };
+    case SUBMITTED_LANDING_FORM:
       return {
         ...state,
-        userName: action.response
-      }
+        userName: payload.response
+      };
+
+    case SUBMITTED_REGISTRATION_FORM: {
+      const emailError = payload.emailError;
+      return {
+        ...state,
+        emailError
+      };
+    }
+    case CLEAR_ERRORS:
+      return {
+        ...state,
+        emailError: "",
+        userNameError: "",
+        passwordError: ""
+      };
     default:
       return state;
   }

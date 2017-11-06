@@ -43,6 +43,29 @@ func (s UserService) GetUser(input GetUserOptions) (*models.User, error) {
 	return &models.User{}, errors.New("No input value given to load by")
 }
 
+// CreateUserOptions is the input param value type for loading a single user
+type CreateUserOptions struct {
+	UserName     string
+	EmailAddress string
+	Password     string
+}
+
+// CreateUser is the main method that we will use to load a user from the datasource
+func (s UserService) CreateUser(input CreateUserOptions) (*models.User, error) {
+	u := models.User{}
+	u.SetEmailAddress(input.EmailAddress).
+		SetUserName(input.UserName).
+		SetPassword(input.Password)
+
+	if userID, err := s.repo.CreateUser(&u); err == nil {
+		u.SetID(userID)
+
+		return &u, errors.New("Error saving new user")
+	}
+
+	return &u, nil
+}
+
 // VerifyEmailAndPassword checks to see if the password matches that of the username
 func (s UserService) VerifyEmailAndPassword(email, password string) bool {
 	return true

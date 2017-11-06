@@ -1,9 +1,10 @@
 package controllers
 
 import (
+	"b2g/app/models"
+	"b2g/app/serializers"
 	"b2g/app/services"
 	"b2g/app/utils/validation"
-	"strconv"
 
 	"github.com/revel/revel"
 )
@@ -32,24 +33,34 @@ func (c Registration) Submit() revel.Result {
 	name := c.Params.Get("username")
 	email := c.Params.Get("email")
 	password := c.Params.Get("password")
-	c.Validation.Required(name).Message("Your name is require!")
-	c.Validation.Required(email).Message("Your email is require!")
+	c.Validation.Required(name).Message("Your name is required. Server")
+	c.Validation.Required(email).Message("Your email is required. Server")
 	c.Validation.Required(password).Message("Your password is required")
 
+	u := &models.User{}
 	if c.Validation.HasErrors() {
-		c.Validation.Keep()
-		c.FlashParams()
-		return c.Redirect(Login.Index)
+		c.Response.Status = 200 //401
+
+		registrationData := serializers.RegistrationData(u, int(NONE), c.Validation.ErrorMap())
+		return c.RenderJSON(registrationData)
 	}
 
-	// Check if the password combination is acceptable
-	users := services.NewUserService(nil)
-	if users.VerifyUserNameAndPassword(name, password) {
-		c.Session["userName"] = name
-		c.Session["loginStatus"] = strconv.Itoa(int(FULL))
+	// @TODO Check if the password meets the requirements. If it is cool then create the user
+	s := services.NewUserService(nil)
+	if u, err := s.CreateUser(services.CreateUserOptions{
+		UserName:     name,
+		EmailAddress: email,
+		Password:     password,
+	}); err != nil {
+		c.Response.Status = 402
+		c.Validation.Error("Failed to save to database").Key("fatal")
+
+		registrationData := serializers.RegistrationData(u, int(NONE), nil)
+		return c.RenderJSON(registrationData)
 	}
 
-	return c.RenderJSON(c.Session)
+	registrationData := serializers.RegistrationData(u, int(FULL), nil)
+	return c.RenderJSON(registrationData)
 }
 
 // CheckUser checks if the username is valid and/or taken
