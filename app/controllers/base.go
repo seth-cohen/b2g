@@ -25,7 +25,7 @@ const (
 // getUserLoginLevel will return the current sessioned user or nil if no userid is found in session
 func (c Base) getUserLoginLevel() LoginStatus {
 	// Check session to see if we have a user
-	if _, ok := c.Session["userName"]; ok {
+	if _, ok := c.Session["username"]; ok {
 		if status, err := strconv.ParseInt(c.Session["loginStatus"], 10, 0); err == nil {
 			return LoginStatus(status)
 		}

@@ -57,11 +57,12 @@ func (s UserService) CreateUser(input CreateUserOptions) (*models.User, error) {
 		SetUserName(input.UserName).
 		SetPassword(input.Password)
 
-	if userID, err := s.repo.CreateUser(&u); err == nil {
-		u.SetID(userID)
-
+	userID, err := s.repo.CreateUser(&u)
+	if err != nil {
 		return &u, errors.New("Error saving new user")
 	}
+
+	u.SetID(int(userID))
 
 	return &u, nil
 }
@@ -77,7 +78,7 @@ func (s UserService) VerifyUserNameAndPassword(email, password string) bool {
 }
 
 // IsUserNameTaken checks to see if the username is currently taken
-func (s UserService) IsUserNameTaken(userName string) bool {
+func (s UserService) IsUserNameTaken(username string) bool {
 	return true
 }
 
@@ -99,10 +100,10 @@ func (s UserService) getByEmail(email string) (*models.User, error) {
 	return user, nil
 }
 
-func (s UserService) getByUserName(userName string) (*models.User, error) {
-	user, err := s.repo.GetByUserName(userName)
+func (s UserService) getByUserName(username string) (*models.User, error) {
+	user, err := s.repo.GetByUserName(username)
 	if err != nil {
-		return nil, errors.New("Unable to get user by userName")
+		return nil, errors.New("Unable to get user by username")
 	}
 
 	return user, nil

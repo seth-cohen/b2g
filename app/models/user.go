@@ -10,7 +10,7 @@ import (
 // to do things on our site. We should build cool things for them
 type User struct {
 	id           int
-	userName     string
+	username     string
 	emailAddress string
 	passwordHash string
 	password     string
@@ -19,12 +19,12 @@ type User struct {
 
 // UserName getter
 func (u User) UserName() string {
-	return u.userName
+	return u.username
 }
 
 // SetUserName setter
-func (u *User) SetUserName(userName string) *User {
-	u.userName = userName
+func (u *User) SetUserName(username string) *User {
+	u.username = username
 
 	return u
 }
@@ -57,7 +57,7 @@ func (u *User) SetEmailAddress(emailAddress string) *User {
 func (u *User) SetPassword(password string) *User {
 	u.password = password
 	if u.passwordHash == "" {
-		u.password, _ = hashPassword(u.password)
+		u.passwordHash, _ = hashPassword(u.password)
 	}
 
 	return u
@@ -66,6 +66,13 @@ func (u *User) SetPassword(password string) *User {
 // PasswordHash getter
 func (u User) PasswordHash() string {
 	return u.passwordHash
+}
+
+// SetPasswordHash setter
+func (u *User) SetPasswordHash(hash string) *User {
+	u.passwordHash = hash
+
+	return u
 }
 
 // HashPassword uses bcrypt to generate the cryptofied version of the password that is safe to save in the DB

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"b2g/app/serializers"
 	"b2g/app/services"
 	"strconv"
 
@@ -12,35 +13,53 @@ type Login struct {
 	Base
 }
 
-// Index is the entry point for the application home page
-func (c Login) Index() revel.Result {
-	// Silly to take them here if they are already logged in - wait no it isn't
-	if c.getUserLoginLevel() == FULL {
-		c.Redirect(App.Index)
-	}
-	return c.Render()
-}
-
-// Post is there to process the login action for the user
+// LoginSubmit is there to process the login action for the user
 // This should probably only handle post requests @TODO figure out a way to limit that
-func (c Login) Post() revel.Result {
-	name := c.Params.Get("username")
-	password := c.Params.Get("password")
-	c.Validation.Required(name).Message("Your name is require!")
+func (c *Login) LoginSubmit() revel.Result {
+	username := c.Params.Form.Get("username")
+	password := c.Params.Form.Get("password")
+	c.Validation.Required(username).Message("Your username is required")
 	c.Validation.Required(password).Message("Your password is required")
 
 	if c.Validation.HasErrors() {
-		c.Validation.Keep()
-		c.FlashParams()
-		return c.Redirect(Login.Index)
+		c.Response.Status = 401
+		loginData := serializers.LoginData(nil, int(NONE), c.Validation.ErrorMap())
+
+		return c.RenderJSON(loginData)
+	}
+
+	// Load the user data
+	users := services.NewUserService(nil)
+	u, err := users.GetUser(services.GetUserOptions{UserName: &username})
+	if err != nil {
+		c.Response.Status = 404
+		c.Validation.Error("Error loading user").Key("userLoad")
+		loginData := serializers.LoginData(nil, int(NONE), c.Validation.ErrorMap())
+
+		return c.RenderJSON(loginData)
 	}
 
 	// Check if the password combination is acceptable
-	users := services.NewUserService(nil)
-	if users.VerifyUserNameAndPassword(name, password) {
-		c.Session["userName"] = name
-		c.Session["loginStatus"] = strconv.Itoa(int(FULL))
+	if !u.VerifyPassword(password) {
+		c.Response.Status = 401
+		c.Validation.Error("Invalid Username/Password Combination").Key("login")
+		loginData := serializers.LoginData(nil, int(NONE), c.Validation.ErrorMap())
+
+		return c.RenderJSON(loginData)
 	}
 
-	return c.RenderJSON(c.Session)
+	c.Session["username"] = username
+	c.Session["loginStatus"] = strconv.Itoa(int(FULL))
+	loginData := serializers.LoginData(u, int(FULL), nil)
+	loginData["sessionUser"] = c.Session["username"]
+
+	return c.RenderJSON(loginData)
+}
+
+// LogoutSubmit is here to process the logout action for the user
+func (c *Login) LogoutSubmit() revel.Result {
+	c.Session["username"] = ""
+	c.Session["loginStatus"] = strconv.Itoa(int(NONE))
+
+	return c.RenderJSON(map[string]bool{"success": true})
 }

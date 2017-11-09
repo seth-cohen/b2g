@@ -9,20 +9,20 @@ import (
 	"github.com/revel/revel"
 )
 
-// Registration is the main Application Controller
-type Registration struct {
+// Users is the main Application Controller
+type Users struct {
 	Base
 }
 
 // Index is there to process the login action for the user
 // This should probably only handle post requests @TODO figure out a way to limit that
-func (c Registration) Index() revel.Result {
+func (c Users) Index() revel.Result {
 	// Render the initial form to register for the site
 	return c.Render()
 }
 
-// Submit parses Post params, creates and persists a user if valid
-func (c Registration) Submit() revel.Result {
+// Create parses Post params, creates and persists a user if valid
+func (c Users) Create() revel.Result {
 	// [Section/Article page 1]
 	// - username, email and email
 	// - first, middle initial?,  last - do we care about these now in the flow? probably not.
@@ -51,20 +51,21 @@ func (c Registration) Submit() revel.Result {
 		UserName:     name,
 		EmailAddress: email,
 		Password:     password,
-	}); err != nil {
-		c.Response.Status = 402
-		c.Validation.Error("Failed to save to database").Key("fatal")
+	}); err == nil {
+		registrationData := serializers.RegistrationData(u, int(FULL), c.Validation.ErrorMap())
 
-		registrationData := serializers.RegistrationData(u, int(NONE), nil)
 		return c.RenderJSON(registrationData)
 	}
 
-	registrationData := serializers.RegistrationData(u, int(FULL), nil)
+	c.Response.Status = 402
+	c.Validation.Error("Failed to save to database").Key("fatal")
+	registrationData := serializers.RegistrationData(u, int(NONE), c.Validation.ErrorMap())
+
 	return c.RenderJSON(registrationData)
 }
 
 // CheckUser checks if the username is valid and/or taken
-func (c Registration) CheckUser() revel.Result {
+func (c Users) CheckUser() revel.Result {
 	name := c.Params.Get("username")
 	c.Validation.Required(name).Message("username is required")
 	if c.Validation.HasErrors() {
@@ -85,6 +86,6 @@ func (c Registration) CheckUser() revel.Result {
 }
 
 // CreateUserProfile
-func (c Registration) CreateUserProfile() revel.Result {
+func (c Users) CreateUserProfile() revel.Result {
 	return c.Render()
 }

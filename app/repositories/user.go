@@ -3,6 +3,7 @@ package repositories
 import (
 	"b2g/app"
 	"b2g/app/models"
+	"database/sql"
 	"strings"
 
 	"github.com/revel/revel"
@@ -14,6 +15,7 @@ const (
 		SELECT 	u.ID, 
 						u.UserName, 
 						u.EmailAddress,
+						u.PasswordHash,
 						up.FirstName,
 						up.LastName,
 						up.MiddleName
@@ -23,9 +25,9 @@ const (
 // UserRepository is the interface that all repositories must implement
 type UserRepository interface {
 	GetByID(id int) (*models.User, error)
-	GetByUserName(userName string) (*models.User, error)
+	GetByUserName(username string) (*models.User, error)
 	GetByEmailAddress(email string) (*models.User, error)
-	CreateUser(user *models.User) (int, error)
+	CreateUser(user *models.User) (int64, error)
 }
 
 // UserMySQLRepository handles all user data storage requests for the MySQL data store
@@ -34,11 +36,12 @@ type UserMySQLRepository struct{}
 // UserResponse is just there to grab the columns of the DB queries since UserModel props are private
 type UserResponse struct {
 	id           int
-	userName     string
+	username     string
 	emailAddress string
-	firstName    string
-	lastName     string
-	middleName   string
+	passwordHash string
+	firstName    sql.NullString
+	lastName     sql.NullString
+	middleName   sql.NullString
 }
 
 // GetByID returns a user loaded from the MySQL data store
@@ -68,8 +71,8 @@ func (db UserMySQLRepository) GetByEmailAddress(emailAddress string) (*models.Us
 }
 
 // GetByUserName returns a user loaded from the MySQL data store
-// builds the sql to query for user based on userName
-func (db UserMySQLRepository) GetByUserName(userName string) (*models.User, error) {
+// builds the sql to query for user based on username
+func (db UserMySQLRepository) GetByUserName(username string) (*models.User, error) {
 	var sqlParts []string
 	sqlParts = append(sqlParts, userSelectSQL)
 	sqlParts = append(sqlParts, `
@@ -77,7 +80,7 @@ func (db UserMySQLRepository) GetByUserName(userName string) (*models.User, erro
 		LEFT JOIN tblUserProfile up ON u.ID = up.UserID
 		WHERE UserName=?;`)
 
-	return db.processGetUserQuery(strings.Join(sqlParts, " "), userName)
+	return db.processGetUserQuery(strings.Join(sqlParts, " "), username)
 }
 
 // GetByEmailAddress returns a user loaded from the MySQL data store
@@ -101,8 +104,9 @@ func (db UserMySQLRepository) processGetUserQuery(sql string, value interface{})
 	for rows.Next() {
 		err := rows.Scan(
 			&data.id,
-			&data.userName,
+			&data.username,
 			&data.emailAddress,
+			&data.passwordHash,
 			&data.firstName,
 			&data.lastName,
 			&data.middleName,
@@ -117,11 +121,10 @@ func (db UserMySQLRepository) processGetUserQuery(sql string, value interface{})
 }
 
 // CreateUser attempts to save user data to the database
-func (db UserMySQLRepository) CreateUser(user *models.User) (int, error) {
-	var userID int
+func (db UserMySQLRepository) CreateUser(user *models.User) (int64, error) {
+	var userID int64
 	sqlString := `
 		INSERT INTO tblUser (UserName, EmailAddress, PasswordHash) VALUES (?, ?, ?);
-		SELECT LAST_INSERT_ID();
 	`
 
 	stmt, err := app.DB.Prepare(sqlString)
@@ -131,20 +134,18 @@ func (db UserMySQLRepository) CreateUser(user *models.User) (int, error) {
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query(user.UserName(), user.EmailAddress(), user.PasswordHash())
+	res, err := stmt.Exec(user.UserName(), user.EmailAddress(), user.PasswordHash())
 	if err != nil {
 		revel.INFO.Println("Error executing query", err)
 		return -1, err
 	}
-	defer rows.Close()
 
-	for rows.Next() {
-		err := rows.Scan(&userID)
-		if err != nil {
-			revel.INFO.Println("Error executing query", err)
-			return -1, err
-		}
+	userID, err = res.LastInsertId()
+	if err != nil {
+		revel.INFO.Println("Failed creating user", err)
+		return -1, err
 	}
+
 	return userID, nil
 }
 
@@ -152,7 +153,8 @@ func mapDataToUser(data UserResponse) *models.User {
 	u := models.User{}
 	u.SetID(data.id)
 	u.SetEmailAddress(data.emailAddress)
-	u.SetUserName(data.userName)
+	u.SetUserName(data.username)
+	u.SetPasswordHash(data.passwordHash)
 
 	return &u
 }

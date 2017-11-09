@@ -5,8 +5,9 @@ import { Route, Redirect } from "react-router-dom";
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route
     {...rest}
-    render={props =>
-      props.isAuthenticated ? (
+    render={props => {
+      console.log(rest);
+      return rest.loginStatus >= rest.requiredLogin ? (
         <Component {...props} />
       ) : (
         <Redirect
@@ -15,18 +16,21 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
             state: { from: props.location }
           }}
         />
-      )}
+      );
+    }}
   />
 );
 
 PrivateRoute.propTypes = {
   component: PropTypes.any.isRequired,
   location: PropTypes.object,
-  isAuthenticated: PropTypes.bool
+  loginStatus: PropTypes.number,
+  requiredLogin: PropTypes.number
 };
 
 PrivateRoute.defaultProps = {
-  isAuthenticated: false,
+  requiredLogin: 10,
+  loginStatus: 0,
   location: null
 };
 

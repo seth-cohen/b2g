@@ -2,32 +2,44 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Redirect, Link } from "react-router-dom";
-import { updateName, submitLoginForm } from "../actions";
+import { submitLoginForm } from "../actions";
+import {
+  getLoginNameError,
+  getLoginPasswordError,
+  getLoginGeneralError
+} from "../selectors";
 import TextInput from "../../design_components/lb_text_input";
 
 class Login extends React.Component {
   static propTypes = {
-    userName: PropTypes.string,
-    password: PropTypes.string,
+    username: PropTypes.string,
+    usernameError: PropTypes.string,
+    emailAddress: PropTypes.string,
+    passwordError: PropTypes.string,
+    loginError: PropTypes.string,
     location: PropTypes.object.isRequired,
-    updateName: PropTypes.func.isRequired,
     submitForm: PropTypes.func.isRequired
   };
 
   static defaultProps = {
-    userName: "",
-    password: ""
+    username: "",
+    emailAddress: "",
+    usernameError: "",
+    passwordError: "",
+    loginError: ""
   };
 
   state = {
-    userName: this.props.userName,
-    password: this.props.password,
+    username: this.props.username,
+    usernameError: this.props.usernameError,
+    password: "",
+    passwordError: this.props.passwordError,
     redirect: false
   };
 
   handleNameChange = e => {
-    const userName = e.target.value;
-    this.setState(() => ({ userName }));
+    const username = e.target.value;
+    this.setState(() => ({ username }));
   };
 
   handlePasswordChange = e => {
@@ -37,18 +49,21 @@ class Login extends React.Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    this.props.submitForm(this.state.userName);
-  };
-
-  handleUpdateClick = () => {
-    this.props.updateName(this.state.userName);
-    this.setState(() => ({ redirect: true }));
+    const { username, password } = this.state;
+    this.props
+      .submitForm({ username, password })
+      .then(() => {
+        this.setState(() => ({ redirect: true }));
+      })
+      .catch(() => {
+        /*noop*/
+      });
   };
 
   render() {
-    const { from } = this.props.location.state || { from: { pathname: "/" } };
+    const { from } = this.props.location.state || { from: { pathname: "/dashboard" } };
     if (this.state.redirect) {
-      return <Redirect to={from} />;
+      return <Redirect exact to={from} />;
     }
 
     return (
@@ -60,6 +75,14 @@ class Login extends React.Component {
                 <header className="card-header text-center">
                   <span className="h5">Sign in to your Account</span>
                 </header>
+                {this.props.loginError && (
+                  <div
+                    className="alert alert-warning mx-4 mt-4 mb-0"
+                    role="alert"
+                  >
+                    {this.props.loginError}
+                  </div>
+                )}
                 <form
                   className="px-4 pt-4"
                   method="POST"
@@ -69,7 +92,14 @@ class Login extends React.Component {
                   <TextInput
                     name="username"
                     label="Username/Email:"
-                    value={this.state.userName}
+                    value={this.state.username}
+                    hasError={
+                      this.state.usernameError.length > 0 ||
+                      this.props.usernameError.length > 0
+                    }
+                    feedbackMessage={
+                      this.state.usernameError || this.props.usernameError
+                    }
                     addonFront={
                       <i className="fa fa-envelope fa-fw prefix grey-text" />
                     }
@@ -80,13 +110,22 @@ class Login extends React.Component {
                     type={this.state.showPassword ? "text" : "password"}
                     label="Password:"
                     value={this.state.password}
+                    hasError={
+                      this.state.passwordError.length > 0 ||
+                      this.props.passwordError.length > 0
+                    }
+                    feedbackMessage={
+                      this.state.passwordError || this.props.passwordError
+                    }
                     addonFront={
                       <i className="fa fa-lock fa-fw prefix grey-text" />
                     }
                     onChange={this.handlePasswordChange}
                   />
                   <div className="text-right">
-                    <button type="submit" className="btn btn-primary">Login</button>
+                    <button type="submit" className="btn btn-primary">
+                      Login
+                    </button>
                   </div>
                   <hr />
                   <section className="text-right">
@@ -107,19 +146,20 @@ class Login extends React.Component {
   }
 }
 
-const mapDispatchToProps = dispatch => {
-  return {
-    updateName: userName => {
-      dispatch(updateName(userName));
-    },
-    submitForm: customData => {
-      dispatch(submitLoginForm(customData));
-    }
-  };
+const mapDispatchToProps = {
+  submitForm: submitLoginForm
 };
 
 const mapStateToProps = state => {
-  return state.login;
+  return {
+    username:
+      state.entities.users.allIDs.indexOf(state.currentUser) !== -1
+        ? state.entities.users.byID[state.currentUser].username
+        : "",
+    usernameError: getLoginNameError(state),
+    passwordError: getLoginPasswordError(state),
+    loginError: getLoginGeneralError(state)
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);

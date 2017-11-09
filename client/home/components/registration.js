@@ -3,13 +3,13 @@ import PropTypes from "prop-types";
 import cx from "classnames";
 import { connect } from "react-redux";
 import { Redirect, Link } from "react-router-dom";
-import { updateName, submitRegistrationForm, clearErrors } from "../actions";
+import { submitRegistrationForm, clearErrors } from "../actions";
 import TextInput from "../../design_components/lb_text_input";
 
 class Registration extends React.Component {
   static propTypes = {
-    userName: PropTypes.string,
-    userNameError: PropTypes.string, // for server side validation
+    username: PropTypes.string,
+    usernameError: PropTypes.string, // for server side validation
     password: PropTypes.string,
     passwordError: PropTypes.string, // for server side validation
     email: PropTypes.string,
@@ -20,8 +20,8 @@ class Registration extends React.Component {
   };
 
   static defaultProps = {
-    userName: "",
-    userNameError: "",
+    username: "",
+    usernameError: "",
     password: "",
     passwordError: "",
     email: "",
@@ -29,8 +29,8 @@ class Registration extends React.Component {
   };
 
   state = {
-    userName: this.props.userName,
-    userNameError: "",
+    username: this.props.username,
+    usernameError: "",
     password: this.props.password,
     passwordError: "",
     showPassword: false,
@@ -41,7 +41,7 @@ class Registration extends React.Component {
 
   validate = () => {
     let errors = {};
-    const { password, email, userName } = this.state;
+    const { password, email, username } = this.state;
     if (password.length === 0) {
       errors.password = "Password is required";
     } else if (password.length < 8) {
@@ -52,10 +52,10 @@ class Registration extends React.Component {
       errors.email = "Email is required";
     }
 
-    if (userName.length === 0) {
-      errors.userName = "Username is required";
-    } else if (userName.length < 8) {
-      errors.userName = "Username is too short";
+    if (username.length === 0) {
+      errors.username = "Username is required";
+    } else if (username.length < 8) {
+      errors.username = "Username is too short";
     }
 
     console.log(errors);
@@ -63,8 +63,8 @@ class Registration extends React.Component {
   };
 
   handleNameChange = e => {
-    const userName = e.target.value;
-    this.setState(() => ({ userName }));
+    const username = e.target.value;
+    this.setState(() => ({ username }));
   };
 
   handleEmailChange = e => {
@@ -91,7 +91,7 @@ class Registration extends React.Component {
     if (Object.keys(errors).length === 0) {
       this.clearErrors();
       this.props.submitForm({
-        userName: this.state.userName,
+        username: this.state.username,
         email: this.state.email,
         password: this.state.password
       });
@@ -99,7 +99,7 @@ class Registration extends React.Component {
       this.setState(() => ({
         passwordError: errors.password || "",
         emailError: errors.email || "",
-        userNameError: errors.userName || ""
+        usernameError: errors.username || ""
       }));
     }
   };
@@ -137,9 +137,9 @@ class Registration extends React.Component {
                   <TextInput
                     name="username"
                     label="Username:"
-                    value={this.state.userName}
-                    hasError={this.state.userNameError.length > 0}
-                    feedbackMessage={this.state.userNameError}
+                    value={this.state.username}
+                    hasError={this.state.usernameError.length > 0 || this.props.usernameError.length > 0}
+                    feedbackMessage={this.state.usernameError || this.props.usernameError}
                     addonFront={
                       <i className="fa fa-user fa-fw prefix grey-text" />
                     }

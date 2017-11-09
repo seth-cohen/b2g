@@ -12,20 +12,21 @@ import (
 	"github.com/revel/revel"
 )
 
-// App is the main Application Controller
-type App struct {
+// Home is the main Application Controller
+type Home struct {
 	Base
 }
 
 // Index is the entry point for the application home page
-func (c App) Index() revel.Result {
+func (c Home) Index() revel.Result {
 	u := &models.User{}
 	var err error
 
 	if c.getUserLoginLevel() > NONE {
 		s := services.NewUserService(nil)
-		userName := c.Session["userName"]
-		if u, err = s.GetUser(services.GetUserOptions{UserName: &userName}); err != nil {
+		username := c.Session["username"]
+		revel.INFO.Println("Sessioned username", username)
+		if u, err = s.GetUser(services.GetUserOptions{UserName: &username}); err != nil {
 			u = &models.User{}
 		}
 	}
@@ -40,7 +41,7 @@ func (c App) Index() revel.Result {
 }
 
 // Hello is the endpoint respond to user form entry
-func (c App) Hello() revel.Result {
+func (c Home) Hello() revel.Result {
 	name := c.Params.Get("name")
 	c.Validation.Required(name).Message("Your name is require!")
 	c.Validation.MinSize(name, 3).Message("Your name is not long enough!")
@@ -48,13 +49,14 @@ func (c App) Hello() revel.Result {
 	if c.Validation.HasErrors() {
 		c.Validation.Keep()
 		c.FlashParams()
-		return c.Redirect(App.Index)
+
+		return c.Redirect(Home.Index)
 	}
 	return c.Render(name)
 }
 
 // GetUser displays user information
-func (c App) GetUser() revel.Result {
+func (c Home) GetUser() revel.Result {
 	s := services.NewUserService(nil)
 	id := 1
 	u, err := s.GetUser(services.GetUserOptions{ID: &id})
@@ -72,7 +74,7 @@ func (c App) GetUser() revel.Result {
 
 // GetGame hits the IGDB api and returns JSON data. This is really just to be deleted stuff
 // here as example of how to make webrequests in GO
-func (c App) GetGame() revel.Result {
+func (c Home) GetGame() revel.Result {
 	client := &http.Client{
 		Timeout: time.Second * 10,
 	}

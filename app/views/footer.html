@@ -1,7 +1,73 @@
   {{if eq .RunMode "dev"}}
     {{template "debug.html" .}}
   {{end}}
-  <script>window.config = {appData: JSON.parse("{{.initial}}")};</script>
+  <script>
+    const appData = {
+      "loginStatus": 0,
+      "currentUser": 6,
+      "entities": {
+        "users": {
+          "byID": {
+            "6": {
+              "username": "shcohen25",
+              "emailAddress": "forwardthinking.llc@gmail.com",
+              "games": [1, 2]
+            }
+          },
+          "allIDs": [6]
+        }, 
+        "userGames": {
+          "byID": {
+            "1": {
+              "id": 1,
+              "userID": 6,
+              "gameID": 1,
+              "platformID": 1
+            },
+            "2": {
+              "id": 1,
+              "userID": 6,
+              "gameID": 2,
+              "platformID": 2
+            }
+          },
+          "allIDs": [1, 2]
+        },
+        "games": {
+          "byID": {
+            "1": {
+              "name": "Super Mario Oddessey",
+              "releaseDate": 1234567890,
+              "publisher": "Activistion",
+              "developer": "343 Studios"
+            },
+            "2": {
+              "name": "Titanfall 2",
+              "releaseDate": 1234567890,
+              "publisher": "Someone Else",
+              "developer": "Some Other Company"
+            }
+          },
+          "allIDs": [1, 2]
+        },
+        "platforms": {
+          "byID": {
+            "1": {
+              "name": "Nintendo Switch",
+              "releaseDate": 1234567890
+            },
+            "2": {
+              "name": "Xbox One X",
+              "releaseDate": 1234567890
+            }
+          },
+          "allIDs": [1, 2]
+        }
+      }
+    };
+    window.config = {appData};
+    //window.config = {appData: JSON.parse("{{.initial}}")};
+  </script>
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>

@@ -1,24 +1,27 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 
 class Header extends React.Component {
   static propTypes = {
-    userName: PropTypes.string
+    username: PropTypes.string,
+    logout: PropTypes.func.isRequired
   };
 
   static defaultProps = {
-    userName: "Guest"
+    username: "Guest"
   };
 
   render() {
     return (
       <nav className="navbar navbar-expand-lg navbar-light bg-secondary mb-4">
         <div className="container">
-          <a className="navbar-brand" href="#">
+          <Link to="/">
             <img src="/public/img/logo_xs.png" />
-          </a>
+          </Link>
           <section className="ml-auto mr-4">
-            <div className="">{`Hello ${this.props.userName}`}</div>
+            <div className="">{`Hello ${this.props.username}`}</div>
+            <button onClick={this.props.logout}>Logout</button>
           </section>
           <button
             className="navbar-toggler"
