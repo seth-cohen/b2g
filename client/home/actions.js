@@ -1,11 +1,12 @@
 import {
   USER_LOGOUT,
+  USER_ADD_NEW,
   LOGIN_SUBMIT_SUCCESS,
   LOGIN_SUBMIT_FAILURE,
-  LOGIN_CLEAR_ERRORS,
+  LOGIN_SET_ERRORS,
   REGISTRATION_SUBMIT_SUCCESS,
   REGISTRATION_SUBMIT_FAILURE,
-  REGISTRATION_CLEAR_ERRORS
+  REGISTRATION_SET_ERRORS
 } from "./types";
 
 function logoutUser() {
@@ -34,8 +35,9 @@ function logoutUser() {
 
 // LOGIN
 const submitLoginForm = data => dispatch => {
+  // Returning a promise so that the calling site can redirect on successful completion of login
   return new Promise((resolve, reject) => {
-    dispatch({ type: LOGIN_CLEAR_ERRORS });
+    dispatch({ type: LOGIN_SET_ERRORS, payload: {} });
 
     // fire off ajax request
     const headers = new Headers();
@@ -86,21 +88,25 @@ const submitLoginForm = data => dispatch => {
 };
 
 // REGISTRATION
-function submitRegistrationForm(data) {
-  return dispatch => {
-    dispatch({ type: REGISTRATION_CLEAR_ERRORS });
+const submitRegistrationForm = data => dispatch => {
+  // Returning a promise so that the calling site can redirect on successful completion of registering
+  return new Promise((resolve, reject) => {
+    dispatch({ type: REGISTRATION_SET_ERRORS, payload: {} });
 
     const headers = new Headers();
+    var form = new FormData();
+    form.append("username", data.username);
+    form.append("password", data.password);
+    form.append("email", data.email);
+
     const init = {
       method: "POST",
       headers,
       credentials: "include",
-      body: JSON.stringify({
-        username: data.username
-      })
+      body: form
     };
 
-    fetch("/api/v1/users/create", init)
+    fetch("/api/v1/users", init)
       .then(function(response) {
         if (response.ok) {
           return response.json();
@@ -116,6 +122,11 @@ function submitRegistrationForm(data) {
           type: REGISTRATION_SUBMIT_SUCCESS,
           payload: { loginStatus }
         });
+        dispatch({
+          type: USER_ADD_NEW,
+          payload: { user: data.currentUser }
+        });
+        resolve();
       })
       .catch(error => {
         console.log(
@@ -129,22 +140,44 @@ function submitRegistrationForm(data) {
               payload: { errors }
             });
           });
+        reject();
       });
+  });
+};
+
+const checkUsername = username => dispatch => {
+  dispatch(setRegistrationErrors({ usernameError: "" }));
+  const init = {
+    method: "GET",
+    headers: new Headers(),
+    credentials: "include"
   };
+
+  fetch(`/api/v1/users/username/${username}`, init).then(response => {
+    if (response.ok) {
+      // The username already exists
+      return dispatch(
+        setRegistrationErrors({ usernameError: "Username is already taken" })
+      );
+    }
+
+    return dispatch(setRegistrationErrors({ usernameError: "" }));
+  });
+};
+
+function setLoginErrors(errors) {
+  return { type: LOGIN_SET_ERRORS, payload: errors };
 }
 
-function clearLoginErrors() {
-  return { type: LOGIN_CLEAR_ERRORS, payload: {} };
-}
-
-function clearRegisrationErrors() {
-  return { type: REGISTRATION_CLEAR_ERRORS, payload: {} };
+function setRegistrationErrors(errors) {
+  return { type: REGISTRATION_SET_ERRORS, payload: errors };
 }
 
 export {
   submitLoginForm,
-  clearLoginErrors,
+  setLoginErrors,
   submitRegistrationForm,
-  clearRegisrationErrors,
+  checkUsername,
+  setRegistrationErrors,
   logoutUser
 };

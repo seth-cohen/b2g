@@ -5,11 +5,13 @@ import { Link } from "react-router-dom";
 class Header extends React.Component {
   static propTypes = {
     username: PropTypes.string,
+    loginStatus: PropTypes.number,
     logout: PropTypes.func.isRequired
   };
 
   static defaultProps = {
-    username: "Guest"
+    username: "Guest",
+    loginStatus: 0
   };
 
   render() {
@@ -20,8 +22,8 @@ class Header extends React.Component {
             <img src="/public/img/logo_xs.png" />
           </Link>
           <section className="ml-auto mr-4">
-            <div className="">{`Hello ${this.props.username}`}</div>
-            <button onClick={this.props.logout}>Logout</button>
+            <div className="">{`Hello ${this.props.loginStatus > 0 ? this.props.username : "Guest"}`}</div>
+            {this.props.loginStatus > 0 && <button onClick={this.props.logout}>Logout</button>}
           </section>
           <button
             className="navbar-toggler"

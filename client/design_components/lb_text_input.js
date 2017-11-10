@@ -21,11 +21,13 @@ class TextInput extends React.Component {
     showLabel: PropTypes.bool,
     addonFront: PropTypes.node,
     addonBack: PropTypes.node,
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
+    onBlur: PropTypes.func
   };
 
   static defaultProps = {
     onChange: noop,
+    onBlur: noop,
     type: "text",
     disabled: false,
     id: "",
@@ -59,6 +61,7 @@ class TextInput extends React.Component {
             name={this.props.name}
             value={this.props.value}
             onChange={this.props.onChange}
+            onBlur={this.props.onBlur}
             disabled={this.props.disabled}
             placeholder={this.props.placeholder}
           />

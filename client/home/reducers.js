@@ -1,12 +1,13 @@
 import { combineReducers } from "redux";
 import {
   USER_LOGOUT,
+  USER_ADD_NEW,
   LOGIN_SUBMIT_SUCCESS,
   LOGIN_SUBMIT_FAILURE,
-  LOGIN_CLEAR_ERRORS,
+  LOGIN_SET_ERRORS,
   REGISTRATION_SUBMIT_SUCCESS,
   REGISTRATION_SUBMIT_FAILURE,
-  REGISTRATION_CLEAR_ERRORS
+  REGISTRATION_SET_ERRORS
 } from "./types";
 
 // LOGIN
@@ -22,11 +23,21 @@ function loginStatus(state = 0, { type, payload }) {
   }
 }
 
+function currentUser(state = 0, { type, payload }) {
+  switch (type) {
+    case USER_LOGOUT:
+      return 0;
+    case USER_ADD_NEW:
+      return payload.user.id
+    default:
+      return state;
+  }
+}
+
 // - LOGIN - UI
 function loginUI(state = { errors: {} }, { type, payload }) {
   switch (type) {
     case LOGIN_SUBMIT_FAILURE: {
-      console.log(payload.errors);
       const errors = {};
       for (const error in payload.errors) {
         errors[`${error}Error`] = payload.errors[error].Message;
@@ -37,14 +48,21 @@ function loginUI(state = { errors: {} }, { type, payload }) {
         errors
       };
     }
-    case LOGIN_CLEAR_ERRORS: {
+    case LOGIN_SET_ERRORS: {
+      const newErrors = {};
+      if (Object.keys(payload).length !== 0) {
+        // We are clearing all errors if payload is empty
+        for (const error in state.errors) {
+          newErrors[error] = state.errors[error];
+        }
+        for (const error in payload) {
+          newErrors[error] = payload[error];
+        }
+      }
+
       return {
         ...state,
-        errors: {
-          usernameError: "",
-          passwordError: "",
-          loginError: ""
-        }
+        errors: newErrors
       };
     }
     default:
@@ -56,42 +74,61 @@ function loginUI(state = { errors: {} }, { type, payload }) {
 function registrationUI(state = { errors: {} }, { type, payload }) {
   switch (type) {
     case REGISTRATION_SUBMIT_FAILURE: {
-      const errors = payload.errors.map(error => {
-        return { [error.Key]: error.Message };
-      });
+      const errors = {};
+      for (const error in payload.errors) {
+        errors[`${error}Error`] = payload.errors[error].Message;
+      }
+
       return {
         ...state,
         errors
       };
     }
-    case REGISTRATION_CLEAR_ERRORS:
+    case REGISTRATION_SET_ERRORS: {
+      const newErrors = {};
+      if (Object.keys(payload).length !== 0) {
+        // We are clearing all errors if payload is empty
+        for (const error in state.errors) {
+          newErrors[error] = state.errors[error];
+        }
+        for (const error in payload) {
+          newErrors[error] = payload[error];
+        }
+      }
+
       return {
         ...state,
-        errors: {
-          usernameError: "",
-          passwordError: "",
-          emailError: "",
-          loginError: ""
-        }
+        errors: newErrors
+      };
+    }
+    default:
+      return state;
+  }
+}
+
+// USERS
+function usersByID(state = {}, { type, payload }) {
+  switch (type) {
+    case USER_ADD_NEW:
+      return {
+        ...state,
+        [payload.user.id]: payload.user
       };
     default:
       return state;
   }
 }
 
-function currentUser(state = 0, { type }) {
+function allUsers(state = [], { type, payload }) {
   switch (type) {
+    case USER_ADD_NEW:
+      return state.concat(payload.user.id)
     default:
       return state;
   }
 }
 
-function users(state = { byID: {}, allIDs: [] }, { type }) {
-  switch (type) {
-    default:
-      return state;
-  }
-}
+const usersReducer = combineReducers({ byID: usersByID, allIDs: allUsers });
 
 function userGames(state = { byID: {}, allIDs: [] }, { type }) {
   switch (type) {
@@ -118,7 +155,7 @@ const homeApp = combineReducers({
   loginStatus,
   currentUser,
   entities: combineReducers({
-    users,
+    users: usersReducer,
     userGames,
     games,
     platforms

@@ -79,7 +79,9 @@ func (s UserService) VerifyUserNameAndPassword(email, password string) bool {
 
 // IsUserNameTaken checks to see if the username is currently taken
 func (s UserService) IsUserNameTaken(username string) bool {
-	return true
+	user, err := s.getByUserName(username)
+
+	return user != nil && user.ID() > 0 && err == nil
 }
 
 func (s UserService) getByID(id int) (*models.User, error) {
