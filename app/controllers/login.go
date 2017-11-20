@@ -33,7 +33,7 @@ func (c *Login) LoginSubmit() revel.Result {
 	u, err := users.GetUser(services.GetUserOptions{UserName: &username})
 	if err != nil {
 		c.Response.Status = 404
-		c.Validation.Error("Error loading user").Key("userLoad")
+		c.Validation.Error("Error loading user").Key("login")
 		loginData := serializers.LoginData(nil, int(NONE), c.Validation.ErrorMap())
 
 		return c.RenderJSON(loginData)

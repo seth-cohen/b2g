@@ -42,7 +42,7 @@ const HomeApp = ({ store }) => (
     <Router>
       <div>
         <ConnectedHeader />
-        <div className="container">
+        <div>
           <Switch>
             <ConnectedPrivateRoute
               exact

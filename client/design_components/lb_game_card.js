@@ -9,7 +9,7 @@ const platformOptions = [
   { id: 4, name: "Nintendo Switch" }
 ];
 
-class Registration extends React.Component {
+class GameCard extends React.Component {
   static propTypes = {
     name: PropTypes.string.isRequired,
     thumbnail: PropTypes.string,
@@ -36,7 +36,6 @@ class Registration extends React.Component {
 
   render() {
     const date = new Date(this.props.releaseDate * 1000);
-
     return (
       <article className="card">
         <div className="row">
@@ -74,4 +73,4 @@ class Registration extends React.Component {
   }
 }
 
-export default Registration;
+export default GameCard;

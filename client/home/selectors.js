@@ -36,9 +36,9 @@ export const getLoginGeneralError = createSelector(
 const getCurrentUserID = state => state.currentUser;
 const getUsers = state => state.entities.users;
 export const getCurrentUsername = createSelector(
-  [getCurrentUserID, getUsers], 
+  [getCurrentUserID, getUsers],
   (id, users) => {
-    return users.allIDs.indexOf(id) !== -1 ? users.byID[id].username : ""
+    return users.allIDs.indexOf(id) !== -1 ? users.byID[id].username : "";
   }
 );
 
@@ -71,3 +71,47 @@ export const getRegistrationGeneralError = createSelector(
     return registrationErrors.registrationError || "";
   }
 );
+
+// DASHBOARD
+const getUserGames = state => state.entities.userGames;
+const getGames = state => state.entities.games;
+const getUserPlatforms = state => state.entities.userPlatforms;
+const getPlatforms = state => state.entities.platforms;
+export const getCurrentUser = createSelector(
+  [getUsers, getCurrentUserID],
+  (users, currentUserID) => users.byID[currentUserID]
+);
+
+export const getUser = userID =>
+  createSelector([getUsers], users => {
+    return users.byID[userID];
+  });
+
+export const getPlatformsForUser = userID =>
+  createSelector(
+    [getUserPlatforms, getPlatforms, getUser(userID)],
+    (userPlatforms, platforms, user) => {
+      return user.platforms.map(userPlatformID => {
+        const userPlatform = userPlatforms.byID[userPlatformID];
+        return {
+          ...userPlatform,
+          platform: platforms.byID[userPlatform.platformID]
+        };
+      });
+    }
+  );
+
+export const getGamesForUser = userID =>
+  createSelector(
+    [getUserGames, getGames, getPlatforms, getUser(userID)],
+    (userGames, games, platforms, user) => {
+      return user.games.map(userGameID => {
+        const userGame = userGames.byID[userGameID];
+        return {
+          ...userGame,
+          game: games.byID[userGame.gameID],
+          platform: platforms.byID[userGame.platformID]
+        };
+      });
+    }
+  );

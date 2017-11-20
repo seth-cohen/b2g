@@ -1,0 +1,29 @@
+@import "../../styles/utilities/colors";
+/* @import "../../styles/utilities/_mixins";*/
+
+.Button {
+  padding: 5px;
+  margin: 4px;
+  border-radius: 8px;
+  font-size: 100%;
+  color: $font-color-primary;
+  &--primary {
+    background-color: $bg-primary;
+    border: 2px solid $border-primary;
+    &:hover {
+      background: $bg-primary-hover;
+      border-color: $border-primary-hover;
+    }
+  }
+  &--ghost {
+    background-color: $clear;
+    border: 2px solid $border-ghost;
+    &:hover {
+      background-color: $bg-ghost-hover;
+      border-color: $border-ghost-hover;
+    }
+  }
+  &--fullWidth {
+    width: 100%;
+  }
+}

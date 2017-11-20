@@ -1,4 +1,5 @@
 import { combineReducers } from "redux";
+import Immutable from "seamless-immutable";
 import {
   USER_LOGOUT,
   USER_ADD_NEW,
@@ -11,31 +12,31 @@ import {
 } from "./types";
 
 // LOGIN
-function loginStatus(state = 0, { type, payload }) {
+function loginStatus(state = Immutable(0), { type, payload }) {
   switch (type) {
     case REGISTRATION_SUBMIT_SUCCESS:
     case LOGIN_SUBMIT_SUCCESS:
       return payload.loginStatus;
     case USER_LOGOUT:
-      return 0;
+      return state.update(0);
     default:
       return state;
   }
 }
 
-function currentUser(state = 0, { type, payload }) {
+function currentUser(state = Immutable(0), { type, payload }) {
   switch (type) {
     case USER_LOGOUT:
       return 0;
     case USER_ADD_NEW:
-      return payload.user.id
+      return state.update(payload.user.id);
     default:
       return state;
   }
 }
 
 // - LOGIN - UI
-function loginUI(state = { errors: {} }, { type, payload }) {
+function loginUI(state = Immutable({ errors: {} }), { type, payload }) {
   switch (type) {
     case LOGIN_SUBMIT_FAILURE: {
       const errors = {};
@@ -43,15 +44,12 @@ function loginUI(state = { errors: {} }, { type, payload }) {
         errors[`${error}Error`] = payload.errors[error].Message;
       }
 
-      return {
-        ...state,
-        errors
-      };
+      return state.set("errors", errors);
     }
     case LOGIN_SET_ERRORS: {
       const newErrors = {};
+      // We are clearing all errors if payload is empty
       if (Object.keys(payload).length !== 0) {
-        // We are clearing all errors if payload is empty
         for (const error in state.errors) {
           newErrors[error] = state.errors[error];
         }
@@ -60,10 +58,7 @@ function loginUI(state = { errors: {} }, { type, payload }) {
         }
       }
 
-      return {
-        ...state,
-        errors: newErrors
-      };
+      return state.set("errors", newErrors);
     }
     default:
       return state;
@@ -71,7 +66,7 @@ function loginUI(state = { errors: {} }, { type, payload }) {
 }
 
 // - REGISTRATION - UI
-function registrationUI(state = { errors: {} }, { type, payload }) {
+function registrationUI(state = Immutable({ errors: {} }), { type, payload }) {
   switch (type) {
     case REGISTRATION_SUBMIT_FAILURE: {
       const errors = {};
@@ -79,10 +74,7 @@ function registrationUI(state = { errors: {} }, { type, payload }) {
         errors[`${error}Error`] = payload.errors[error].Message;
       }
 
-      return {
-        ...state,
-        errors
-      };
+      return state.set("errors", errors);
     }
     case REGISTRATION_SET_ERRORS: {
       const newErrors = {};
@@ -96,10 +88,7 @@ function registrationUI(state = { errors: {} }, { type, payload }) {
         }
       }
 
-      return {
-        ...state,
-        errors: newErrors
-      };
+      return state.set("errors", newErrors);
     }
     default:
       return state;
@@ -107,22 +96,19 @@ function registrationUI(state = { errors: {} }, { type, payload }) {
 }
 
 // USERS
-function usersByID(state = {}, { type, payload }) {
+function usersByID(state = Immutable({}), { type, payload }) {
   switch (type) {
     case USER_ADD_NEW:
-      return {
-        ...state,
-        [payload.user.id]: payload.user
-      };
+      return state.merge({[payload.user.id]: payload.user});
     default:
       return state;
   }
 }
 
-function allUsers(state = [], { type, payload }) {
+function allUsers(state = Immutable([]), { type, payload }) {
   switch (type) {
     case USER_ADD_NEW:
-      return state.concat(payload.user.id)
+      return state.concat(payload.user.id);
     default:
       return state;
   }
@@ -130,21 +116,28 @@ function allUsers(state = [], { type, payload }) {
 
 const usersReducer = combineReducers({ byID: usersByID, allIDs: allUsers });
 
-function userGames(state = { byID: {}, allIDs: [] }, { type }) {
+function userGames(state = Immutable({ byID: {}, allIDs: [] }), { type }) {
   switch (type) {
     default:
       return state;
   }
 }
 
-function games(state = { byID: {}, allIDs: [] }, { type }) {
+function games(state = Immutable({ byID: {}, allIDs: [] }), { type }) {
   switch (type) {
     default:
       return state;
   }
 }
 
-function platforms(state = { byID: {}, allIDs: [] }, { type }) {
+function userPlatforms(state = Immutable({ byID: {}, allIDs: [] }), { type }) {
+  switch (type) {
+    default:
+      return state;
+  }
+}
+
+function platforms(state = Immutable({ byID: {}, allIDs: [] }), { type }) {
   switch (type) {
     default:
       return state;
@@ -158,6 +151,7 @@ const homeApp = combineReducers({
     users: usersReducer,
     userGames,
     games,
+    userPlatforms,
     platforms
   }),
   ui: combineReducers({

@@ -1,0 +1,31 @@
+@import "./utilities/colors";
+@import "./utilities/reset";
+@import "./utilities/_mixins";
+
+body {
+  font-family: "Open Sans", "Roboto", sans-serif;
+  font-size: 16px;
+  color: $font-color-primary;
+  max-width: 1080px;
+  @include linear-gradient(to right, $bg-page-highlight 0, $bg-page-dark 50%, $bg-page-highlight 100%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  margin: 0 auto;
+}
+.u-container {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.u-textCenter {
+  text-align: center;
+}
+
+.u-flexLeft {
+  -webkit-align-self: flex-start;
+  align-self: flex-start;
+}
+
+.u-flexRight {
+  margin-left: auto;
+}

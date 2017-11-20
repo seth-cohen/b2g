@@ -9,7 +9,7 @@ class SelectInput extends React.Component {
     label: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     value: PropTypes.string.isRequired,
-    options: PropTypes.arrayOf(PropTypes.object),
+    options: PropTypes.arrayOf(PropTypes.object).isRequired,
     type: PropTypes.oneOf(["text", "password", "number", "email", "tel"]),
     id: PropTypes.string,
     placeholder: PropTypes.string,
@@ -60,7 +60,7 @@ class SelectInput extends React.Component {
           placeholder={this.props.placeholder}
         >
           {this.props.options.map( option => (
-            <option value={option.id}>{option.name}</option>
+            <option key={option.id} value={option.id}>{option.name}</option>
           ))}
         </select>
         {this.props.feedbackMessage && (

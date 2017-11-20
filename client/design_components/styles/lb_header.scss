@@ -1,0 +1,36 @@
+@import "../../styles/utilities/colors";
+
+.Navbar {
+  font-size: 110%;
+  margin: 20px 5px;
+  a {
+    text-decoration: none;
+      color: lighten($blue, 50%);
+  }
+  li {
+    list-style: none;
+  }
+  ul {
+    padding-left: 0;
+  }
+  &-branding {
+    padding: 0 20px 0 0;
+  }
+  &-menu {
+    &-item {
+      padding: 4px 20px 15px;
+      border-bottom: 2px solid $dark-grey;
+      &:hover {
+        padding-bottom: 14px;
+        border-bottom: 4px solid $blue;
+	& a,
+	& i {
+	  color: lighten($blue, 30%);
+	}
+      }
+      i {
+        margin-right: .5rem;
+      }
+    }
+  }
+}

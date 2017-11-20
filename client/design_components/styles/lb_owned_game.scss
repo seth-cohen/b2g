@@ -1,0 +1,89 @@
+@import "../../styles/utilities/colors";
+@import "../../styles/utilities/_mixins";
+
+.OwnedGame {
+  @include box-shadow();
+  $og: &;
+  position: relative;
+  background: $bg-dark;
+  color: $font-color-btn-medium;
+  margin: 5px;
+  &-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    font-size: 22px;
+    padding: 0.5em;
+    p {
+      margin: 0;
+    }
+    &-iconLink {
+      line-height: 1.5;
+    }
+  }
+  &,
+  &-thumbnail {
+    width: 320px;
+    height: 200px;
+  }
+  &-thumbnail {
+    object-fit: cover; /* Do not scale the image */
+    object-position: center; /* Center the image within the element */
+  }
+  &-overlay {
+    background: rgba(0, 0, 0, 0.7);
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    height: 100%;
+    &-actions {
+      position: absolute;
+      text-align: center;
+      padding-left: 1em;
+      padding-right: 1em;
+      width: 100%;
+      top: 80%;
+      left: 50%;
+      -webkit-transform: translate(-50%, -50%);
+      -moz-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+    }
+  }
+  &-overlay,
+  &-overlay-actions {
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    -webkit-transition: all 0.4s ease-in-out 0s;
+    -moz-transition: all 0.4s ease-in-out 0s;
+    transition: all 0.4s ease-in-out 0s;
+  }
+  @media (hover) {
+    &:hover {
+      #{$og}-overlay {
+        opacity: 1;
+        &-actions {
+          top: 50%;
+          opacity: 1;
+        }
+      }
+    }
+  }
+  @media (hover:none) {
+    &.is-active {
+      #{$og}-overlay {
+        opacity: 1;
+        &-actions {
+          top: 50%;
+          opacity: 1;
+        }
+      }
+    }
+  }
+  &-details {
+    font-size: 14px;
+  }
+}

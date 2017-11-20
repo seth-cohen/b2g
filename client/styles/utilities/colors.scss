@@ -1,0 +1,41 @@
+// Colors
+$dark-grey: #282828;
+$dark-purple: #0c0032;
+$purple: #190061;
+$blue-purple: #240090;
+$blue: #3500d3;
+
+$midnight-blue: #393d49;
+$sky-blue: #63a5d3;
+$sky-blue-dulled: #2967a3;
+$light-grey: #f2f3f3;
+$dull-yellow: #dfd39f;
+$clear: rgba(0, 0, 0, .3);
+
+$bg-page-dark: black;
+$bg-page-highlight: $dark-purple; 
+
+$bg-primary: $blue;
+$bg-primary-hover: darken($bg-primary, 20%);
+$bg-ghost: $clear;
+$bg-ghost-hover: black;
+
+$border-primary: $blue-purple;
+$border-primary-hover: lighten($border-primary, 20%);
+$border-ghost: $blue;
+$border-ghost-hover: darken($border-ghost, 20%);
+
+$primary-opacity: 1;
+$secondary-opacity: 0.5;
+
+$bg-dark: #44464c;
+$bg-medium: #979690;
+$bg-light: #b7b9b5;
+
+$font-color-primary: $light-grey;
+
+$font-color-btn-primary: black;
+$font-color-btn-primary-hover: $light-grey;
+$font-color-btn-medium: $dull-yellow;
+$font-color-btn-ghost: $sky-blue;
+$font-color-btn-ghost-hover: $light-grey;

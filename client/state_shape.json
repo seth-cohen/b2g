@@ -7,7 +7,15 @@
         "6": {
           "username": "shcohen25",
           "emailAddress": "forwardthinking.llc@gmail.com",
-          "games": [1, 2]
+          "games": [1, 2],
+          "platforms": [1, 2],
+          "profile": {
+            "thumbnail": "/public/images/default_avatar/bender.png",
+            "firstName": "Seth",
+            "lastName": "Cohen",
+            "middleName": "Harris",
+            "aboutMe": ""
+          }
         }
       },
       "allIDs": [6]
@@ -17,31 +25,52 @@
         "1": {
           "id": 1,
           "userID": 6,
+          "lastPlayed": null,
           "gameID": 1,
           "platformID": 1
         },
         "2": {
-          "id": 1,
+          "id": 2,
           "userID": 6,
+          "lastPlayed": null,
           "gameID": 2,
           "platformID": 2
         }
       },
       "allIDs": [1, 2]
     },
+    "userPlatforms": {
+      "byID": {
+        "1": {
+          "id": 1,
+          "userID": 6,
+          "lastPlayed": null,
+          "platformID": 1
+        },
+        "2": {
+          "id": 2,
+          "userID": 6,
+          "lastPlayed": null,
+          "platformID": 2
+        }
+      },
+      "allIDs": []
+    },
     "games": {
       "byID": {
         "1": {
+          "id": 1,
           "name": "Super Mario Oddessey",
           "releaseDate": 1234567890,
-          "publisher": "Activistion",
-          "developer": "343 Studios"
+          "publishers": ["Activistion"],
+          "developers": ["343 Studios"]
         },
         "2": {
+          "id": 2,
           "name": "Titanfall 2",
           "releaseDate": 1234567890,
-          "publisher": "Someone Else",
-          "developer": "Some Other Company"
+          "publishers": ["Someone Else"],
+          "developers": ["Some Other Company"]
         }
       },
       "allIDs": [1, 2]
@@ -49,10 +78,12 @@
     "platforms": {
       "byID": {
         "1": {
+          "id": 1,
           "name": "Nintendo Switch",
           "releaseDate": 1234567890
         },
         "2": {
+          "id": 2,
           "name": "Xbox One X",
           "releaseDate": 1234567890
         }

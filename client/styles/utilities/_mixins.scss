@@ -1,0 +1,110 @@
+@mixin box-shadow($top: 5px, $left: 5px, $blur: 5px, $color:#333333, $inset: false) {
+  @if $inset {
+    box-shadow: inset $top $left $blur $color;
+  } @else {
+    box-shadow: $top $left $blur $color;
+  }
+}
+
+@mixin text-field {
+  display: inline-block;
+  outline: none;
+  text-decoration: none;
+  font: 14px/100% Arial, Helvetica, sans-serif;
+  padding: 0.5em;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  @include rounded();
+  @include box-shadow(0, 1px, 2px, rgba(0, 0, 0, 0.2));
+}
+
+@mixin button($color: $red, $text_color: $white) {
+  display: inline-block;
+  outline: none;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  font: 14px/100% Arial, Helvetica, sans-serif;
+  padding: 0.5em 2em 0.55em;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  @include rounded();
+  @include box-shadow(0, 1px, 2px, rgba(0, 0, 0, 0.2));
+
+  color: $text_color !important;
+  font-weight: bold;
+  border: solid 1px darken($color, 18%);
+  background: $color;
+  @include gradient(saturate($color, 15%), darken($color, 15%));
+
+  &:hover {
+    text-decoration: none;
+    background: saturate($color, 10%);
+    @include gradient(saturate($color, 5%), darken($color, 5%));
+  }
+
+  &:active {
+    position: relative;
+    top: 1px;
+    color: saturate($color, 15%);
+    @include gradient(saturate($color, 15%), lighten($color, 15%));
+  }
+}
+
+@mixin rounded($radius: 0.5em) {
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+  border-radius: $radius;
+}
+
+/// Test if `$value` is a valid direction
+/// @param {*} $value - Value to test
+/// @return {Bool}
+@function is-direction($value) {
+  $is-keyword: index((to top, to top right, to right top, to right, to bottom right, to right bottom, to bottom, to bottom left, to left bottom, to left, to left top, to top left), $value);
+  $is-angle: type-of($value) == 'number' and index('deg' 'grad' 'turn' 'rad', unit($value));
+
+  @return $is-keyword or $is-angle;
+}
+
+/// Convert a direction to legacy syntax
+/// @param {Keyword | Angle} $value - Value to convert
+/// @require {function} is-direction
+/// @require {function} convert-angle
+/// @throw Cannot convert `#{$value}` to legacy syntax because it doesn't seem to be a direction.;
+@function legacy-direction($value) {
+  @if is-direction($value) == false {
+    @error "Cannot convert `#{$value}` to legacy syntax because it doesn't seem to be a direction.";
+  }
+
+  $conversion-map: (
+    to top          : bottom,
+    to top right    : bottom left,
+    to right top    : left bottom,
+    to right        : left,
+    to bottom right : top left,
+    to right bottom : left top,
+    to bottom       : top,
+    to bottom left  : top right,
+    to left bottom  : right top,
+    to left         : right,
+    to left top     : right bottom,
+    to top left     : bottom right
+  );
+
+  @if map-has-key($conversion-map, $value) {
+    @return map-get($conversion-map, $value);
+  }
+
+  @return 90deg - $value;
+}
+
+@mixin linear-gradient($direction, $color-stops...) {
+  // Direction has been omitted and happens to be a color-stop
+  @if is-direction($direction) == false {
+    $color-stops: $direction, $color-stops;
+    $direction: 180deg;
+  }
+
+  background: nth(nth($color-stops, 1), 1);
+  background: -webkit-linear-gradient(legacy-direction($direction), $color-stops);
+  background: linear-gradient($direction, $color-stops);
+}

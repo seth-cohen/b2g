@@ -1,0 +1,23 @@
+@import "../../styles/utilities/colors";
+@import "../../styles/utilities/fonts";
+@import "../../styles/utilities/_mixins";
+.Counter {
+  width: 90px;
+  height: 125px;
+  background-color: $purple;
+  @include linear-gradient(to right, $purple 0, $blue 50%, $purple 100%);
+  text-align: center;
+  border-radius: 45px / 63px;
+  color: lighten($blue, 40%);
+  &-title {
+    font-size: $font-md;
+  }
+  &-value {
+    font-size: $font-xxl;
+  }
+  &-value,
+  &-title {
+    margin: 0;
+    line-height: 1em;
+  }
+}
